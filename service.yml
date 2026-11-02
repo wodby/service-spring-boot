@@ -1,0 +1,56 @@
+name: spring-boot
+type: service
+from: java
+fromVersionConstraint: "^1.0.0"
+fromVersion: "1.0.0"
+guidance: GUIDANCE.md
+icon: spring
+title: Spring Boot
+labels:
+- spring-boot
+- spring
+- java
+
+env:
+# Readiness follows Spring Boot Actuator's health endpoint, which includes the database.
+- name: JAVA_READY_PATH
+  value: /actuator/health
+- name: SPRING_PROFILES_ACTIVE
+  value: dev
+  envType: dev
+
+links:
+- name: db
+  env:
+  - name: SPRING_DATASOURCE_URL
+    value: '{{link.database.jdbcUrl}}'
+  - name: SPRING_DATASOURCE_USERNAME
+    value: '{{link.database.user.name}}'
+  - name: SPRING_DATASOURCE_PASSWORD
+    value: '{{link.database.user.password}}'
+    secret: true
+- name: redis
+  env:
+  - name: SPRING_DATA_REDIS_HOST
+    value: '{{link.host}}'
+  - name: SPRING_DATA_REDIS_PORT
+    value: '{{link.port}}'
+  - name: SPRING_DATA_REDIS_PASSWORD
+    value: '{{link.tokens.password}}'
+    secret: true
+- name: sendmail
+  env:
+  - name: SPRING_MAIL_HOST
+    value: '{{link.host}}'
+  - name: SPRING_MAIL_PORT
+    value: '{{link.port}}'
+
+build:
+  dockerfile: Dockerfile
+  connect: true
+  boilerplates:
+  - name: spring-boot
+    title: Spring Boot boilerplate
+    optionVersionConstraint: ">=21"
+    repo: https://github.com/wodby/spring-boot-boilerplate
+    branch: main
